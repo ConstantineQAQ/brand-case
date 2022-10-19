@@ -30,6 +30,23 @@ public class BrandServiceImpl implements BrandService {
     }
 
     @Override
+    public List<Brand> SelectById(int id) {
+        SqlSessionFactory sqlSessionFactory = SqlSessionFactoryUtils.getSqlSessionFactory();
+
+
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+
+
+        BrandMapper mapper = sqlSession.getMapper(BrandMapper.class);
+
+        List<Brand> brands = mapper.SelectById(id);
+
+        sqlSession.close();
+
+        return brands;
+    }
+
+    @Override
     public void add(Brand brand) {
         SqlSessionFactory sqlSessionFactory = SqlSessionFactoryUtils.getSqlSessionFactory();
 
@@ -38,6 +55,35 @@ public class BrandServiceImpl implements BrandService {
         BrandMapper mapper = sqlSession.getMapper(BrandMapper.class);
 
         mapper.add(brand);
+
+        sqlSession.commit();
+        sqlSession.close();
+    }
+
+
+    @Override
+    public void deleteById(int id) {
+        SqlSessionFactory sqlSessionFactory = SqlSessionFactoryUtils.getSqlSessionFactory();
+
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+
+        BrandMapper mapper = sqlSession.getMapper(BrandMapper.class);
+
+        mapper.deleteById(id);
+
+        sqlSession.commit();
+        sqlSession.close();
+    }
+
+    @Override
+    public void update(Brand brand) {
+        SqlSessionFactory sqlSessionFactory = SqlSessionFactoryUtils.getSqlSessionFactory();
+
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+
+        BrandMapper mapper = sqlSession.getMapper(BrandMapper.class);
+
+        mapper.update(brand);
 
         sqlSession.commit();
         sqlSession.close();
@@ -129,6 +175,7 @@ public class BrandServiceImpl implements BrandService {
 
         return pageBean;
     }
+
 
 
 }

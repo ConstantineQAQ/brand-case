@@ -14,41 +14,14 @@
             }
         </style>
 
-        <!--        <style>
-                    .el-carousel__item h3 {
-                        color: #475669;
-                        font-size: 14px;
-                        opacity: 0.75;
-                        line-height: 200px;
-                        margin: 0;
-                    }
-
-                    .el-carousel__item:nth-child(2n) {
-                        background-color: #99a9bf;
-                    }
-
-                    .el-carousel__item:nth-child(2n+1) {
-                        background-color: #d3dce6;
-                    }
-                </style>-->
-
-
     </head>
     <body>
         <div id="app">
 
-            <!--            <template>
-                            <el-carousel :interval="4000" type="card" height="200px">
-                                <el-carousel-item v-for="item in 6" :key="item">
-                                    <h3 class="medium">{{ item }}</h3>
-                                </el-carousel-item>
-                            </el-carousel>
-                        </template>-->
-
             <!--搜索表单-->
-            <el-form :inline="true" :model="brand" class="demo-form-inline">
+            <el-form :inline="true" :model="Sbrand" class="demo-form-inline">
                 <el-form-item label="状态">
-                    <el-select v-model="brand.status" placeholder="状态">
+                    <el-select v-model="Sbrand.status" placeholder="状态">
                         <el-option label="启用" value="1"></el-option>
                         <el-option label="禁用" value="0"></el-option>
                     </el-select>
@@ -56,11 +29,11 @@
 
 
                 <el-form-item label="品牌名称">
-                    <el-input v-model="brand.brandName" placeholder="品牌名称"></el-input>
+                    <el-input v-model="Sbrand.brandName" placeholder="品牌名称"></el-input>
                 </el-form-item>
 
                 <el-form-item label="企业名称">
-                    <el-input v-model="brand.companyName" placeholder="企业名称"></el-input>
+                    <el-input v-model="Sbrand.companyName" placeholder="企业名称"></el-input>
                 </el-form-item>
 
                 <el-form-item>
@@ -113,6 +86,46 @@
 
             </el-dialog>
 
+            <!--表单对话框-->
+            <el-dialog
+                    title="提示"
+                    :visible.sync="UdialogVisible"
+                    width="30%">
+
+                <!--新增对话框-->
+                <el-form ref="form" :model="Ubrand" label-width="80px">
+                    <el-form-item label="品牌名称">
+                        <el-input v-model="Ubrand.brandName"></el-input>
+                    </el-form-item>
+
+                    <el-form-item label="企业名称">
+                        <el-input v-model="Ubrand.companyName"></el-input>
+                    </el-form-item>
+
+                    <el-form-item label="排序">
+                        <el-input v-model="Ubrand.ordered"></el-input>
+                    </el-form-item>
+
+                    <el-form-item label="备注">
+                        <el-input type="textarea" v-model="Ubrand.description"></el-input>
+                    </el-form-item>
+
+                    <el-form-item label="状态">
+                        <el-switch v-model="Ubrand.status"
+                                   active-value="1"
+                                   inactive-value="0"
+
+                        ></el-switch>
+                    </el-form-item>
+
+                    <el-form-item>
+                        <el-button type="primary" @click="update">提交</el-button>
+                        <el-button @click="UdialogVisible = false">取消</el-button>
+                    </el-form-item>
+                </el-form>
+
+            </el-dialog>
+
 
             <!--表格-->
             <template>
@@ -148,7 +161,7 @@
                             label="排序">
                     </el-table-column>
                     <el-table-column
-                            prop="status"
+                            prop="statusStr"
                             label="当前状态"
                             align="center">
                     </el-table-column>
@@ -157,10 +170,10 @@
                             label="操作"
                             align="center">
 
-                        <el-row>
-                            <el-button type="primary" icon="el-icon-edit" circle></el-button>
-                            <el-button type="danger" icon="el-icon-delete" circle></el-button>
-                        </el-row>
+                        <template slot-scope="scope">
+                            <el-button type="primary" icon="el-icon-edit" @click="selectById(scope.row.id)" size="medium"></el-button>
+                            <el-button type="danger" icon="el-icon-delete" @click="deleteById(scope.row.id)" size="medium" ></el-button>
+                        </template>
 
                     </el-table-column>
 
@@ -219,8 +232,8 @@
 
                         axios({
                             method: "post",
-                            url: "http://localhost:8080/brand-case/brand/selectByPageAndCondition?currentPage="+this.currentPage+"&pageSize="+this.pageSize,
-                            data:this.brand
+                            url: "/brand-case/brand/selectByPageAndCondition?currentPage="+this.currentPage+"&pageSize="+this.pageSize,
+                            data:this.Sbrand
                         }).then(function (resp) {
                             //设置表单数据
                             _this.tableData = resp.data.rows;
@@ -228,6 +241,35 @@
                             //设置总记录数
                             _this.totalCount = resp.data.totalCount;
                         })
+                    },
+
+                    selectById(id){
+                        var _this = this;
+                        this.selectId = id
+                        axios({
+                            method:"post",
+                            url:"/brand-case/brand/selectById",
+                            data:_this.selectId
+                        }).then(function (resp) {
+                            _this.Ubrand=resp.data[0]
+                            _this.UdialogVisible = true
+                            console.log("success")
+                        })
+                    },
+                    update(){
+                        var _this = this
+                      axios({
+                          method:"post",
+                          url:"/brand-case/brand/update",
+                          data:_this.Ubrand
+                      }).then(function (resp) {
+                          if(resp.data == "success"){
+                              _this.UdialogVisible=false
+
+                              _this.selectAll()
+
+                          }
+                      })
                     },
 
                     tableRowClassName({row, rowIndex}) {
@@ -253,7 +295,7 @@
                         /*console.log(_this.brand);*/
                         axios({
                             method: "post",
-                            url: "http://localhost:8080/brand-case/brand/add",
+                            url: "/brand-case/brand/add",
                             data: _this.brand
                         }).then(function (resp) {
                             if (resp.data == "success") {
@@ -296,7 +338,7 @@
                             //发送请求
                             axios({
                                 method: "post",
-                                url: "http://localhost:8080/brand-case/brand/deleteByIds",
+                                url: "/brand-case/brand/deleteByIds",
                                 data: _this.selectIds
                             }).then(function (resp) {
                                 if (resp.data == "success") {
@@ -315,8 +357,38 @@
                             });
                         });
 
-                    }
-                },
+                    },
+                    //单独删除
+                    deleteById(id){
+                        this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
+                            confirmButtonText: '确定',
+                            cancelButtonText: '取消',
+                            type: 'warning'
+                        }).then(() => {
+                            var _this = this
+                            this.selectId = id
+                            axios({
+                                method: "post",
+                                url: "/brand-case/brand/deleteById",
+                                data: _this.selectId
+                            }).then(function (resp) {
+                                if (resp.data == "success") {
+                                    //删除成功
+
+                                    _this.selectAll();
+
+                                    _this.success();
+                                }
+                            })
+
+
+                    }).catch(() => {
+                            this.$message({
+                                type: 'info',
+                                message: '已取消删除'
+                            });
+                        });
+                    }},
                 data() {
                     return {
 
@@ -328,6 +400,7 @@
 
                         //添加数据对话框展示开关
                         dialogVisible: false,
+                        UdialogVisible:false,
 
                         //复选框选中集合
                         multipleSelection: [],
@@ -335,8 +408,26 @@
                         //选中的数组
                         selectIds: [],
 
+                        selectId: 0,
+
                         //品牌模型数据
                         brand: {
+                            status: '',
+                            brandName: '',
+                            companyName: '',
+                            id: "",
+                            ordered: "",
+                            description: ""
+                        },
+                        Sbrand: {
+                            status: '',
+                            brandName: '',
+                            companyName: '',
+                            id: "",
+                            ordered: "",
+                            description: ""
+                        },
+                        Ubrand: {
                             status: '',
                             brandName: '',
                             companyName: '',

@@ -14,6 +14,12 @@ public interface BrandService {
 
     List<Brand> SelectAll();
 
+    /**
+     * 查询单个
+     * @return
+     */
+    List<Brand> SelectById(int id);
+
 
     /**
      * 添加
@@ -42,4 +48,16 @@ public interface BrandService {
      * @return
      */
     PageBean<Brand> selectByPageAndCondition(int currentPage,int pageSize,Brand brand);
+
+    /**
+     * 单独删除
+     * @param id
+     */
+    void deleteById(int id);
+
+    /**
+     * 修改
+     * @param brand
+     */
+    void update(Brand brand);
 }

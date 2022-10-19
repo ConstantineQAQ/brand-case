@@ -16,6 +16,14 @@ public interface BrandMapper {
     @ResultMap("brandResultMap")
     List<Brand> SelectAll();
 
+    /**
+     * 查询单个
+     * @return
+     */
+    @Select("select * from tb_brand where id = #{id}")
+    @ResultMap("brandResultMap")
+    List<Brand> SelectById(@Param("id") int id);
+
 
     /**
      * 添加数据
@@ -31,6 +39,13 @@ public interface BrandMapper {
      */
 
     void deleteByIds(@Param("ids") int [] ids);
+
+    /**
+     * 单独删除
+     * @param id
+     */
+    @Delete("delete from tb_brand where id = #{id}")
+    void deleteById(@Param("id") int id);
 
 
     /**
@@ -65,5 +80,12 @@ public interface BrandMapper {
      * @return
      */
     List<Brand> selectByPageAndCondition(@Param("begin") int begin,@Param("size") int size,@Param("brand") Brand brand);
+
+    /**
+     * 更改
+     * @param brand
+     */
+    @Update("update tb_brand set brand_name = #{brandName},company_name = #{companyName},ordered = #{ordered},description = #{description},status = #{status} where id = #{id}")
+    void update(Brand brand);
 
 }

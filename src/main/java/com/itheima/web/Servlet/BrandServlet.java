@@ -31,7 +31,63 @@ public class BrandServlet extends BaseServlet{
         response.getWriter().write(jsonString);
     }
 
+    /**
+     * 删除单个
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
+    public void selectById(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //1. 接收数据  1
+        BufferedReader br = request.getReader();
+        String params = br.readLine();//json字符串
 
+        //转为 int
+        Integer id = JSON.parseObject(params, int.class);
+
+        //1. 调用service查询
+        List<Brand> brands = brandService.SelectById(id);
+
+        //2. 转为JSON
+        String jsonString = JSON.toJSONString(brands);
+        //3. 写数据
+        response.setContentType("text/json;charset=utf-8");
+        response.getWriter().write(jsonString);
+    }
+
+    /**
+     * 修改
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
+
+    public void update(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        //1. 接收品牌数据
+        BufferedReader br = request.getReader();
+        String params = br.readLine();//json字符串
+
+        //转为Brand对象
+        Brand brand = JSON.parseObject(params, Brand.class);
+
+        //2. 调用service添加
+        brandService.update(brand);
+
+        //3. 响应成功的标识
+        response.getWriter().write("success");
+    }
+
+
+    /**
+     * 添加
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
     public void add(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         //1. 接收品牌数据
@@ -70,6 +126,30 @@ public class BrandServlet extends BaseServlet{
         //3. 响应成功的标识
         response.getWriter().write("success");
     }
+
+    /**
+     * 单独删除
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
+    public void deleteById(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        //1. 接收数据  1
+        BufferedReader br = request.getReader();
+        String params = br.readLine();//json字符串
+
+        //转为 int
+        Integer id = JSON.parseObject(params, int.class);
+
+        //2. 调用service添加
+        brandService.deleteById(id);
+
+        //3. 响应成功的标识
+        response.getWriter().write("success");
+    }
+
 
     /**
      * 分页查询

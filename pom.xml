@@ -50,7 +50,13 @@
     </dependencies>
 
     <build>
+        <finalName>brand-case</finalName>
+
         <plugins>
+
+
+
+            <!--tomcat插件-->
             <plugin>
                 <groupId>org.apache.tomcat.maven</groupId>
                 <artifactId>tomcat7-maven-plugin</artifactId>
